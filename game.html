@@ -1,0 +1,358 @@
+<!DOCTYPE HTML>
+<html lang="en-gb">
+
+<head>
+  <title>Insertion Sort Game</title>
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Andrew Virnuls">
+  <meta name="description" content="Remember how a bubble sort works by doing it yourself!">
+  <link rel="canonical" href="https://www.advanced-ict.info/interactive/insertion_sort.html">
+  <link href="/style/screen.css" rel="stylesheet" type="text/css" media="screen">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#37143F">
+  <meta property="og:site_name" content="Computing and ICT in a Nutshell">
+  <meta property="og:title" content="Insertion Sort Game">
+  <meta property="og:url" content="https://www.advanced-ict.info/interactive/insertion_sort.html">
+  <meta property="og:image" content="https://www.advanced-ict.info/graphics/og_square.png">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="Check your understanding of how insertion sort works with this interactive game.">
+  <meta property="og:locale" content="en_GB">
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "https://www.advanced-ict.info",
+          "name": "Home",
+          "image": "https://www.advanced-ict.info/graphics/logo_small.png"
+        }
+      }, {
+        "@type": "ListItem",
+        "position": 2,
+        "item": {
+          "@id": "https://www.advanced-ict.info/home/algorithms.html",
+          "name": "Algorithms"
+        }
+      }, {
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "https://www.advanced-ict.info/interactive/insertion_sort.html",
+          "name": "Insertion Sort Game"
+        }
+      }]
+    }
+    
+  </script>
+  <style>
+    body, h1, h2, p, input, button {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+    .container {
+      /* margin-top: 50px; */
+      /* padding: 1px; */
+      /* background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+      align-items: center; /* Vertically center bars */
+       justify-content: center; /* Horizontally center bars */
+       background-image: url('back.png'); /* Replace 'your-image.jpg' with the path to your image */
+      background-size: cover; /* This ensures the image covers the entire background */
+      background-position: center; /* This centers the image */
+      background-repeat: no-repeat; /* This prevents the image from repeating */
+
+    }
+
+    #container {
+      width: 100%;
+      height: 363px;
+      text-align: center;
+    }
+
+    #bars {
+        width: 100%; /* Full width */
+        max-width: 1000px;
+        height: 360px;
+        position: relative;
+        display: flex;
+        align-items: center; /* Vertically center bars */
+        justify-content: center; /* Horizontally center bars */
+        margin: auto;
+    }
+
+    .bar {
+      width: 8%;
+      margin: 0 1%;
+      background-color: #777777;
+      color: white;
+      position: absolute;
+      bottom: 5px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 5px;
+      font-size: 200%;
+      font-weight: 500;
+      border-radius: 2%;
+    }
+
+    #controls {
+        margin: auto;
+      /* width: 520px; */
+
+      vertical-align: middle;
+      display: inline-block;
+      text-align: center;
+    
+      padding-left: 30rem;
+      padding-right: 10rem; 
+      margin-bottom: 0rem;
+    }
+
+    #controls p {
+      text-align: center;
+    }
+
+    #commentary {
+      height: 100px;
+      vertical-align: middle;
+      width: auto;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 500;
+      
+      
+    }
+
+    body:after {
+      display: none;
+    }
+  </style>
+  <SCRIPT>
+    <!--
+    var bar;
+    var current;
+    var pen = 2;
+    var colour = new Array("#777777", "#007bff");
+    var yes = new Array("✅");
+    var no = new Array("❌");
+    var choice_text = new Array();
+    choice_text[false] = no;
+    choice_text[true] = yes;
+    var game_over, penalty, start_time, shift;
+    var compcount = 0;
+    
+    function time_now()
+    {
+        var d = new Date();
+        return d.getTime();
+    }
+    
+    function init()
+    {
+      var number = new Array();
+      var i;
+      compcount=0;
+      while(number.length < 10)
+      {
+        i = Math.floor(Math.random() * 94) + 6;
+        if(number.includes(i) == false) { number.push(i); }
+      }
+      bar = document.getElementsByClassName("bar");
+      for(i = 0; i < 10; i++) 
+      { 
+        bar[i].innerHTML = number[i];
+        bar[i].style.left = i*10 + "%";
+        bar[i].style.height = number[i] * 3.5 + "px";
+        bar[i].style.backgroundColor = colour[0];
+        
+
+      }
+      current = 0;
+      bar[0].style.backgroundColor = colour[1];
+      document.onkeydown = key_pressed;
+      game_over = false;
+      penalty = 0;
+      shift = 0;
+      start_time = time_now();
+      document.getElementById("commentary").innerHTML = "Press <em>L</em> or <em>S</em> on the keyboard or use the buttons to make your choice.";
+      //---------------------------------------
+      document.getElementById("compCountDisplay").innerText = "Comparison Count: " + compcount;
+    }
+    
+    function left(msg = true) {
+      
+      document.getElementById("compCountDisplay").innerText = "Comparison Count: " + compcount;
+      compcount++;
+
+      if (!game_over) {
+        if (current - shift > 0 && bar[current - shift].innerHTML * 1 < bar[current - shift - 1].innerHTML * 1) {
+          document.getElementById("commentary").innerHTML = choice_text[msg][Math.floor(Math.random() * choice_text[msg].length)] + " - <span>" + bar[current - shift].innerHTML + " needed to be moved to the left.</span>";
+          var temp = bar[current - shift].innerHTML * 1;
+          bar[current - shift].innerHTML = bar[current - shift - 1].innerHTML;
+          bar[current - shift].style.height = bar[current - shift].innerHTML * 3.5 + "px";
+          bar[current - shift].style.backgroundColor = colour[0];
+
+          bar[current - shift - 1].innerHTML = temp;
+          bar[current - shift - 1].style.height = bar[current - shift - 1].innerHTML * 3.5 + "px";
+          bar[current - shift - 1].style.backgroundColor = colour[1];
+
+          shift++;
+        } else {
+          if (current == bar.length - 1 && msg) {
+            penalty += pen;
+            end_game(false);
+          } else {
+            if (current != bar.length - 1) {
+              penalty += pen;
+            }
+            stick(false);
+          }
+        }
+      }
+    }
+    
+    
+    function stick(msg = true) {
+      
+      document.getElementById("compCountDisplay").innerText = "Comparison Count: " + compcount;
+      
+
+      if (!game_over) {
+        if ((current - shift == 0 || bar[current - shift].innerHTML * 1 > bar[current - shift - 1].innerHTML * 1) && current < bar.length - 1) {
+          document.getElementById("commentary").innerHTML = choice_text[msg][Math.floor(Math.random() * choice_text[msg].length)] + " - <span>" + bar[current - shift].innerHTML + " was in the right place.</span>";
+          if (current < bar.length - 1) {
+            compcount++;
+            bar[current - shift].style.backgroundColor = colour[0];
+            current++;
+            bar[current].style.backgroundColor = colour[1];
+            shift = 0;
+          } else {
+            penalty += pen;
+            shift++;
+            left(false);
+          }
+        } else {
+          if (current == bar.length - 1 && !msg) {
+            end_game(true);
+          } else {
+            if (current - shift < bar.length) {
+              penalty += pen;
+            }
+            left(false);
+          }
+        }
+      }
+    }
+    
+    
+    function end_game(correct) {
+      var time_taken = Math.round((time_now() - start_time) / 1000);
+      var prefix;
+      if (correct) {
+        prefix = "Yes";
+        penalty -= 2;
+      } else {
+        prefix = "Sorry";
+      }
+      game_over = true;
+      var text = prefix + " - the final value is in the right place.  <br>The numbers were successfully sorted in " + time_taken + " seconds."
+      if (penalty > 0) {
+        text += " <br>There is a penalty of " + penalty + " seconds for incorrect choices, making a total of " + (time_taken + penalty) + " seconds.";
+      }
+      text += "<br><input type='button' value='Play Again ⟳' onclick='init()' style='margin-top: 5px; display: inline-block; padding: 12px 24px; font-size: 19px; font-weight: bold; text-align: center; text-decoration: none; cursor: pointer; border: 2px solid #007bff; border-radius: 4px; color: #fff; background-color: #007bff; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;' onmouseover='this.style.backgroundColor=\"#0056b3\"; this.style.borderColor=\"#0056b3\"; this.style.color=\"#fff\";' onmouseout='this.style.backgroundColor=\"#007bff\"; this.style.borderColor=\"#007bff\"; this.style.color=\"#fff\";'>";
+    
+      // Update font-size for the text message
+      text = "<p style='font-size: 19px;'>" + text + "</p>";
+    
+      document.getElementById("commentary").innerHTML = text;
+    }
+    
+    function key_pressed(event)
+    {
+        var ev = event || window.event;
+      if(ev.key == "l" || ev.key == "L") {	left(); }
+      if(ev.key == "s" || ev.key == "S") {	stick(); }
+    }
+    //-->
+    
+    </SCRIPT>
+</head>
+
+<body onload="init()">
+  <main>
+    
+    <div class="container">
+        <header>
+            <!-- <h1 style="font-size: 36px; text-align: center; margin-bottom: 20px; ">Insertion Sort Game</h1> -->
+          </header>
+      
+          <p style="font-size: 20px; text-align: center; padding-left: 10rem; padding-right: 10rem;">
+            <br><br><br><br><br><br><br><strong>Should the highlighted number stay in its current position or does it need to be moved to the left?</strong><br>
+            You will be timed to see how long you take to complete the sort, and there will be a two-second<br> penalty for each incorrect decision.
+            
+          </p>
+          <p style="font-size: 26px;font-weight: 600; padding-left: 45rem; margin-bottom: 0rem;" id="compCountDisplay"></p>  
+      <div id="bars" style="position: relative; align-items: center;">
+        <div class="bar"></div>
+  <div class="bar"></div>
+  <div class="bar"></div>
+  <div class="bar"></div>
+  <div class="bar"></div>
+  <div class="bar"></div>
+  <div class="bar"></div>
+  <div class="bar"></div>
+  <div class="bar"></div>
+  <div class="bar"></div>
+      </div>
+      
+      <div id="controls">
+        <p style="font-size: 26px;font-weight: 600;padding: 0; ">
+            Action for the highlighted value (key)?  
+            <input type="button" value="🡨 Left" onclick="left()" style="
+              display: inline-block;
+              padding: 12px 24px;
+              font-size: 16px;
+              font-weight: bold;
+              text-align: center;
+              text-decoration: none;
+              cursor: pointer;
+              border: 2px solid #007bff;
+              border-radius: 4px;
+              color: #fff;
+              background-color: #007bff;
+              transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+              box-shadow: rgba(4, 120, 49, 0.35) 0px 5px 15px;
+            " onmouseover="this.style.backgroundColor='#0056b3'; this.style.borderColor='#0056b3'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='#007bff'; this.style.borderColor='#007bff'; this.style.color='#fff';">
+            
+            <input type="button" value="✔ Stay" onclick="stick()" style="
+              display: inline-block;
+              padding: 12px 24px;
+              font-size: 16px;
+              font-weight: bold;
+              text-align: center;
+              text-decoration: none;
+              cursor: pointer;
+              border: 2px solid #28a745;
+              border-radius: 4px;
+              color: #fff;
+              background-color: #28a745;
+              transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+              box-shadow: rgba(4, 120, 49, 0.35) 0px 5px 15px;
+            " onmouseover="this.style.backgroundColor='#218838'; this.style.borderColor='#218838'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='#28a745'; this.style.borderColor='#28a745'; this.style.color='#fff';">
+          </p><p id="commentary"></p>
+          
+          
+
+          
+
+      </div>
+    </div>
+    <p id="commentary"></p>
+  </main>
+</body>
+
+</html>
